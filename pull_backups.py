@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+from __future__ import print_function
 import sys
 import logging
 import re
@@ -7,12 +8,17 @@ import boto3
 import datetime
 import os
 import argparse
-import urllib
+import urllib.request
 import tempfile
 import subprocess
 import shutil
 from util import util
 import json
+import sys
+
+
+def eprint(*args, **kwargs):
+    print(*args, file=sys.stderr, **kwargs)
 
 
 # Fake class only for purpose of limiting global namespace to the 'g' object
@@ -105,22 +111,22 @@ def main(argv):
                             }, ExpiresIn = 10 * 60)
                         if backup_folder == '':
                             backup_folder = 'ccb'
-                        print 'Retrieving: ' + file_dir + '/' + backup_folder + '.zip'
-                        urllib.urlretrieve(url, file_dir + '/' + backup_folder + '.zip')
+                        print('Retrieving: ' + file_dir + '/' + backup_folder + '.zip')
+                        urllib.request.urlretrieve(url, file_dir + '/' + backup_folder + '.zip')
                     else:
                         message('Error finding latest backup file to retrieve. Aborting!')
                         sys.exit(1)
 
     # Instructions to user on how to rsync to Synology (can be unreliable) and then how to remove temp files
     # on this Mac
-    print 'Files are now downloaded into a date-stamped directory inside a temporary directory.'
-    print 'Execute the following commands to (1) push backup files to Synology and (2) delete the temporary directory'
-    print 'and intermediate files stored on this Mac.'
+    print('Files are now downloaded into a date-stamped directory inside a temporary directory.')
+    print('Execute the following commands to (1) push backup files to Synology and (2) delete the temporary directory')
+    print('and intermediate files stored on this Mac.')
     print
-    print 'rsync --append --rsync-path=/bin/rsync -aviz ' + config_settings["rsync_shell_flags"] + ' "' + \
-        file_dir + '" ' + config_settings["rsync_remote_target_dir"]
+    print('rsync --append --rsync-path=/bin/rsync -aviz ' + config_settings["rsync_shell_flags"] + ' "' + \
+        file_dir + '" ' + config_settings["rsync_remote_target_dir"])
     print
-    print 'rm -rf ' + temp_dir
+    print('rm -rf ' + temp_dir)
 
     # If rsync to Synology ran reliably, these would be commands to automatically rsync and delete the files
     #os.system('rsync --append --rsync-path=/bin/rsync -aviz ' + config_settings["rsync_shell_flags"] + ' "' + \
@@ -135,8 +141,7 @@ def message(str):
     global g
 
     datetime_stamp = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-    #print >> sys.stderr, datetime_stamp + ':' + g.program_filename + ':' + level + ':' + s
-    print >> sys.stderr, datetime_stamp + ':' + g.program_filename + ':' + ':' + str
+    eprint(datetime_stamp + ':' + g.program_filename + ':' + ':' + str)
 
 
 def message_info(s):
@@ -160,7 +165,7 @@ def output_message(s, level):
     # Only echo to stderr if logger is logging to file (and not stderr)
     if g.args.message_output_filename is not None:
         datetime_stamp = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        print >> sys.stderr, datetime_stamp + ':' + g.program_filename + ':' + level + ':' + s
+        eprint(datetime_stamp + ':' + g.program_filename + ':' + level + ':' + s)
 
 
 if __name__ == "__main__":

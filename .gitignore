@@ -5,6 +5,7 @@ pull_backups.config
 
 # Any files in local tmp directory
 tmp/
+venv/
 
 #######################################################################################################################
 # Generic Python .gitignore's below

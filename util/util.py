@@ -2,7 +2,7 @@
 
 import logging
 import os
-import ConfigParser
+import configparser
 import string
 import sys
 import re
